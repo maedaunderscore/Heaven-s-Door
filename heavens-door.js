@@ -43,29 +43,44 @@ if(!plugins.heavens) {
 }
 
 function registerPlugin(pluginname, pl){
+    function openPage(url, callback, charset) {
+	if(!charset) charset = "text/html; charset=utf-8";
+	var xhr = new XMLHttpRequest();
+	xhr.onload = function(){
+	    callback(xhr.responseText);	
+	};
+	xhr.onerror = function(){	// TODO: 読み込みに失敗してもこれが呼ばれない
+	    display.notify(M({
+		ja: url+"の取得に失敗しました。",
+		en: url+" not available."
+	    }));
+	};
+	xhr.open("get", url, true);
+	xhr.overrideMimeType(charset);
+	xhr.send(null);
+    }
+    function openPages(urls, callback, finish){
+	if(_.isEmpty(urls)) {
+	    finish();
+	}else{
+	    const url = urls.shift()
+	    openPage(url, function(doc){
+		var newurls = callback(doc);
+
+		openPages(urls.concat(newurls), callback, finish);
+	    });
+	}
+    }
+
     const defaultPlugin = {
 	flags : [IGNORE | HIDDEN, 0, 0, 0, 0],
 	open : function(selected){
 	    gBrowser.loadOneTab(selected[0], null, null, null, false);
 	},
-	xpath: function(el, xpath) {return content.document.evaluate(xpath, el, null, 7, null);},
-	
-	openPage : function(url, callback, charset) {
-	    if(!charset) charset = "text/html; charset=utf-8";
-	    var xhr = new XMLHttpRequest();
-	    xhr.onload = function(){
-		callback(xhr.responseText);	
-	    };
-	    xhr.onerror = function(){	// TODO: 読み込みに失敗してもこれが呼ばれない
-		display.notify(M({
-		    ja: url+"の取得に失敗しました。",
-		    en: url+" not available."
-		}));
-	    };
-	    xhr.open("get", url, true);
-	    xhr.overrideMimeType(charset);
-	    xhr.send(null);
-	},
+	xpath: function(el, xpath) {
+	    return content.document.evaluate(xpath, el, null, 7, null);},
+	openPage : openPage,
+	openPages : openPages,
 	openWithEditor : function(src){
 	    if(src) window.KeySnail.modules.userscript.editFile(src)
 	},

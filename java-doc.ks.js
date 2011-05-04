@@ -7,7 +7,7 @@ var PLUGIN_INFO =
     <version>0.0.1</version>
     <updateURL>http://github.com/maeda-/Heaven-s-Door/raw/master/java-doc.ks.js</updateURL>
     <iconURL>http://github.com/</iconURL>
-    <author mail="clouds.across.the.moon@gmail.com" twitter="maeda_" homepage="http://d.hatena.ne.jp/clouds-across-the-moon//">maeda_</author>
+    <author mail="clouds.across.the.moon@gmail.com" twitter="maeda_" homepage="http://d.hatena.ne.jp/clouds-across-the-moon/">maeda_</author>
     <license>The MIT License</license>
     <license lang="ja">MIT ライセンス</license>
     <minVersion>1.5.6</minVersion>
