@@ -82,7 +82,7 @@ HeavensDoors("heaven.dotnet.references", function(param){
 	    }
 	    function extractNamespace(doc){
 		const ret = self.xpath(doc, ".//div/div/h1").snapshotItem(0).innerHTML.match(/^(.*) Namespaces?$/);
-		return (ret)? ret[1] : "00000UNKNOWN NAMESPACE";
+		return (ret)? ret[1] : "Root Page";
 	    }
 	    const doc = textToDOM(doctext);
 	    const namespace = extractNamespace(doc) + ".";
@@ -101,7 +101,7 @@ HeavensDoors("heaven.dotnet.references", function(param){
 		}else{
 		    for(var j = 0; j < links.snapshotLength; j++){
 			var link = links.snapshotItem(j);
-			indexes.push([link.href, namespace + link.innerHTML, type]);
+			indexes.push([link.href, namespace + link.innerHTML.replace(/<\/?span[^>]*>/g, ""), type]);
 		    }
 		}
 	    }
