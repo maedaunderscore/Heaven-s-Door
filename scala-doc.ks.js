@@ -127,11 +127,24 @@ HeavensDoors("heaven.scala.references", function(param){
 
     if(param.rootSourceDir){
 	plugin.view = function(){
-	    if(content.location.href.indexOf(param.rootDocUrl) != 0) return false;
 
-	    const comment = this.xpath(content.document.body, '//div[@id="comment"]').snapshotItem(0);
-	    const link = comment.innerHTML.match("source: <a href=\"([^\"]*)\">")[1];
-	    const sourceDir = this.appendPath(param.rootSourceDir, link.match(param.rootSourceLinkUrl+"(.*\.scala)")[1]);
+	    const comment = this.xpath(content.document.body, '//div[@id="comment"]')
+	    if(comment.snapshotLength == 0) return false;
+	    const link = comment.snapshotItem(0).innerHTML.match("source: <a href=\"([^\"]*)\">");
+	    if(!link) return false;
+	    var sourceDir = null;
+	    if(link[1].match(/file:\/\//)){ 
+		sourceDir = link[1]
+	    }else{
+		if(content.location.href.indexOf(param.rootDocUrl) != 0) return false;
+		const sourceLinkUrl = link[1].match(param.rootSourceLinkUrl+"(.*\.scala)")
+		if(sourceLinkUrl){
+		    sourceDir = this.appendPath(param.rootSourceDir, sourceLinkUrl[1])
+		}else{
+		    return false;
+		}
+	    }
+
 	    this.openWithEditor(sourceDir);
 	    return true;
 	}

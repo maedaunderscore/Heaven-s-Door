@@ -81,30 +81,38 @@ HeavensDoors("heaven.dotnet.references", function(param){
 		return self.xpath(table, './tbody/tr/td/a');
 	    }
 	    function extractNamespace(doc){
-		const ret = self.xpath(doc, ".//div/div/h1").snapshotItem(0).innerHTML.match(/^(.*) Namespaces?$/);
-		return (ret)? ret[1] : "Root Page";
-	    }
-	    const doc = textToDOM(doctext);
-	    const namespace = extractNamespace(doc) + ".";
-	    display.showPopup("now analyzing : " + namespace);
-	    const tables = self.xpath(doc, "//table[@class='members']")
-	    for(var i = 0; i < tables.snapshotLength; i++){
-		var table = tables.snapshotItem(i);
-		var type = tableType(table);
-		var links = extractLinks(table);
-		
-		if(type == "Namespace"){
-		    for(var j = 0; j < links.snapshotLength; j++){
-			var link = links.snapshotItem(j);
-			urls.push(link.href);
-		    }
+		const header = self.xpath(doc, ".//div/div/h1")
+		if(header.snapshotLength != 0) {
+		    const ret =  header.snapshotItem(0).innerHTML.match(L("^(.*) (Namespaces?|名前空間)$"))
+		    return (ret)? ret[1] : "Root Page";
 		}else{
-		    for(var j = 0; j < links.snapshotLength; j++){
-			var link = links.snapshotItem(j);
-			indexes.push([link.href, namespace + link.innerHTML.replace(/<\/?span[^>]*>/g, ""), type]);
-		    }
+		    return "ERROR";
 		}
 	    }
+
+	    try{
+		const doc = textToDOM(doctext);
+		const namespace = extractNamespace(doc) + ".";
+		display.echoStatusBar("now analyzing : " + namespace);
+		const tables = self.xpath(doc, "//table[@class='members']")
+		for(var i = 0; i < tables.snapshotLength; i++){
+		    var table = tables.snapshotItem(i);
+		    var type = tableType(table);
+		    var links = extractLinks(table);
+		    
+		    if(type == "Namespace" || type == L("名前空間")){
+			for(var j = 0; j < links.snapshotLength; j++){
+			    var link = links.snapshotItem(j);
+			    urls.push(link.href);
+			}
+		    }else{
+			for(var j = 0; j < links.snapshotLength; j++){
+			    var link = links.snapshotItem(j);
+			    indexes.push([link.href, namespace + link.innerHTML.replace(/<\/?span[^>]*>/g, ""), type]);
+			}
+		    }
+		}
+	    }finally{}
 	    return urls;
 	}
 
